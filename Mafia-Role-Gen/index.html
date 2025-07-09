@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- SEO Meta Tags -->
+    <title>Mafia Role Assignment App | Random Role Generator for Mafia</title>
+    <meta name="description" content="Easily assign random roles for your Mafia game. Add players, select roles (Doctor, Cop, Mafia, Innocent, Narrator), and let the app randomly distribute them.">
+    <meta name="keywords" content="mafia game, role assignment, party game, random generator, werewolf game">
+    <meta name="author" content="Mafia Role Assignment App">
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Mafia Role Assignment App">
+    <meta property="og:description" content="Random role generator for Mafia party games">
+    <meta property="og:type" content="website">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎭</text></svg>">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="src/style.css">
+</head>
+<body>
+<!-- Skip to main content for accessibility -->
+<a href="#main-content" class="skip-link">Skip to main content</a>
+
+<!-- Header -->
+<header class="header">
+    <div class="container">
+        <h1 class="app-title">
+            <i class="fas fa-mask" aria-hidden="true"></i>
+            Mafia Role Assignment
+        </h1>
+        <p class="app-subtitle">Random role generator for Mafia</p>
+    </div>
+</header>
+
+<!-- Main Content -->
+<main id="main-content" class="main">
+    <div class="container">
+        <!-- Game Setup Section -->
+        <section class="setup-section" id="setupSection">
+            <div class="setup-card">
+                <h2>
+                    <i class="fas fa-users" aria-hidden="true"></i>
+                    Game Setup
+                </h2>
+
+                <!-- Player Input -->
+                <div class="input-section">
+                    <h3>Add Players</h3>
+                    <div class="player-input-group">
+                        <div class="input-wrapper">
+                            <input
+                                    type="text"
+                                    id="playerNameInput"
+                                    placeholder="Enter player name"
+                                    maxlength="20"
+                                    aria-label="Player name input"
+                            >
+                            <button
+                                    type="button"
+                                    id="addPlayerBtn"
+                                    class="btn btn-primary"
+                                    aria-label="Add player"
+                            >
+                                <i class="fas fa-plus" aria-hidden="true"></i>
+                                Add Player
+                            </button>
+                        </div>
+                        <div class="quick-add">
+                            <span>Quick add:</span>
+                            <input
+                                    type="number"
+                                    id="quickAddNumber"
+                                    min="1"
+                                    max="20"
+                                    placeholder="5"
+                                    aria-label="Number of players to quick add"
+                            >
+                            <button
+                                    type="button"
+                                    id="quickAddBtn"
+                                    class="btn btn-secondary"
+                            >
+                                Add Players
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Players List -->
+                    <div class="players-container">
+                        <div class="players-header">
+                            <h4>Players (<span id="playerCount">0</span>)</h4>
+                            <button
+                                    type="button"
+                                    id="clearPlayersBtn"
+                                    class="btn btn-text"
+                                    style="display: none;"
+                            >
+                                <i class="fas fa-trash" aria-hidden="true"></i>
+                                Clear All
+                            </button>
+                        </div>
+                        <ul id="playersList" class="players-list" role="list">
+                            <!-- Players will be added here dynamically -->
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Role Selection -->
+                <div class="roles-section">
+                    <h3>Select Roles</h3>
+                    <div class="roles-grid">
+                        <!-- Mafia Role -->
+                        <div class="role-card mafia">
+                            <div class="role-header">
+                                <div class="role-icon">
+                                    <i class="fas fa-user-secret" aria-hidden="true"></i>
+                                </div>
+                                <div class="role-info">
+                                    <h4>Mafia</h4>
+                                    <p>Eliminate townspeople at night</p>
+                                </div>
+                            </div>
+                            <div class="role-controls">
+                                <button type="button" class="quantity-btn" onclick="changeRoleQuantity('mafia', -1)" aria-label="Decrease mafia count">
+                                    <i class="fas fa-minus" aria-hidden="true"></i>
+                                </button>
+                                <span class="quantity" id="mafia-count">1</span>
+                                <button type="button" class="quantity-btn" onclick="changeRoleQuantity('mafia', 1)" aria-label="Increase mafia count">
+                                    <i class="fas fa-plus" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Doctor Role -->
+                        <div class="role-card doctor">
+                            <div class="role-header">
+                                <div class="role-icon">
+                                    <i class="fas fa-user-md" aria-hidden="true"></i>
+                                </div>
+                                <div class="role-info">
+                                    <h4>Doctor</h4>
+                                    <p>Protect someone each night</p>
+                                </div>
+                            </div>
+                            <div class="role-controls">
+                                <button type="button" class="quantity-btn" onclick="changeRoleQuantity('doctor', -1)" aria-label="Decrease doctor count">
+                                    <i class="fas fa-minus" aria-hidden="true"></i>
+                                </button>
+                                <span class="quantity" id="doctor-count">1</span>
+                                <button type="button" class="quantity-btn" onclick="changeRoleQuantity('doctor', 1)" aria-label="Increase doctor count">
+                                    <i class="fas fa-plus" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Cop Role -->
+                        <div class="role-card cop">
+                            <div class="role-header">
+                                <div class="role-icon">
+                                    <i class="fas fa-shield-alt" aria-hidden="true"></i>
+                                </div>
+                                <div class="role-info">
+                                    <h4>Cop</h4>
+                                    <p>Investigate players each night</p>
+                                </div>
+                            </div>
+                            <div class="role-controls">
+                                <button type="button" class="quantity-btn" onclick="changeRoleQuantity('cop', -1)" aria-label="Decrease cop count">
+                                    <i class="fas fa-minus" aria-hidden="true"></i>
+                                </button>
+                                <span class="quantity" id="cop-count">1</span>
+                                <button type="button" class="quantity-btn" onclick="changeRoleQuantity('cop', 1)" aria-label="Increase cop count">
+                                    <i class="fas fa-plus" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Narrator Role -->
+                        <div class="role-card narrator">
+                            <div class="role-header">
+                                <div class="role-icon">
+                                    <i class="fas fa-microphone" aria-hidden="true"></i>
+                                </div>
+                                <div class="role-info">
+                                    <h4>Narrator</h4>
+                                    <p>Moderates the game</p>
+                                </div>
+                            </div>
+                            <div class="role-controls">
+                                <button type="button" class="quantity-btn" onclick="changeRoleQuantity('narrator', -1)" aria-label="Decrease narrator count">
+                                    <i class="fas fa-minus" aria-hidden="true"></i>
+                                </button>
+                                <span class="quantity" id="narrator-count">1</span>
+                                <button type="button" class="quantity-btn" onclick="changeRoleQuantity('narrator', 1)" aria-label="Increase narrator count">
+                                    <i class="fas fa-plus" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Innocent Role -->
+                        <div class="role-card innocent">
+                            <div class="role-header">
+                                <div class="role-icon">
+                                    <i class="fas fa-user" aria-hidden="true"></i>
+                                </div>
+                                <div class="role-info">
+                                    <h4>Innocent</h4>
+                                    <p>Regular townspeople</p>
+                                </div>
+                            </div>
+                            <div class="role-controls">
+                                <button type="button" class="quantity-btn" onclick="changeRoleQuantity('innocent', -1)" aria-label="Decrease innocent count">
+                                    <i class="fas fa-minus" aria-hidden="true"></i>
+                                </button>
+                                <span class="quantity" id="innocent-count">2</span>
+                                <button type="button" class="quantity-btn" onclick="changeRoleQuantity('innocent', 1)" aria-label="Increase innocent count">
+                                    <i class="fas fa-plus" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Role Summary -->
+                    <div class="role-summary">
+                        <div class="summary-item">
+                            <span class="summary-label">Total Roles:</span>
+                            <span class="summary-value" id="totalRoles">6</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Total Players:</span>
+                            <span class="summary-value" id="totalPlayers">0</span>
+                        </div>
+                        <div class="summary-status" id="summaryStatus">
+                            <i class="fas fa-info-circle" aria-hidden="true"></i>
+                            Add players to continue
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button
+                            type="button"
+                            id="assignRolesBtn"
+                            class="btn btn-primary btn-large"
+                            disabled
+                    >
+                        <i class="fas fa-random" aria-hidden="true"></i>
+                        Assign Roles Randomly
+                    </button>
+                    <button
+                            type="button"
+                            id="presetBtn"
+                            class="btn btn-secondary"
+                    >
+                        <i class="fas fa-magic" aria-hidden="true"></i>
+                        Use Preset
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Results Section -->
+        <section class="results-section" id="resultsSection" style="display: none;">
+            <div class="results-card">
+                <div class="results-header">
+                    <h2>
+                        <i class="fas fa-scroll" aria-hidden="true"></i>
+                        Role Assignments
+                    </h2>
+                    <div class="results-actions">
+                        <button
+                                type="button"
+                                id="revealAllBtn"
+                                class="btn btn-secondary"
+                        >
+                            <i class="fas fa-eye" aria-hidden="true"></i>
+                            Reveal All
+                        </button>
+                        <button
+                                type="button"
+                                id="newGameBtn"
+                                class="btn btn-primary"
+                        >
+                            <i class="fas fa-redo" aria-hidden="true"></i>
+                            New Game
+                        </button>
+                    </div>
+                </div>
+
+                <div class="assignments-container">
+                    <div class="assignments-grid" id="assignmentsGrid">
+                        <!-- Role assignments will be displayed here -->
+                    </div>
+                </div>
+
+                <div class="game-summary">
+                    <h3>Game Summary</h3>
+                    <div class="summary-grid" id="gameSummary">
+                        <!-- Game summary will be displayed here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Preset Modal -->
+        <div class="modal" id="presetModal" role="dialog" aria-labelledby="presetModalTitle" aria-hidden="true">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="presetModalTitle">Choose a Preset</h3>
+                    <button class="modal-close" onclick="closePresetModal()" aria-label="Close modal">
+                        <i class="fas fa-times" aria-hidden="true"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="presets-grid">
+                        <div class="preset-card" onclick="applyPreset('classic')">
+                            <h4>Classic (6 players)</h4>
+                            <div class="preset-roles">
+                                <span class="preset-role mafia">2 Mafia</span>
+                                <span class="preset-role doctor">1 Doctor</span>
+                                <span class="preset-role cop">1 Cop</span>
+                                <span class="preset-role innocent">2 Innocent</span>
+                            </div>
+                        </div>
+
+                        <div class="preset-card" onclick="applyPreset('large')">
+                            <h4>Large Game (10 players)</h4>
+                            <div class="preset-roles">
+                                <span class="preset-role mafia">3 Mafia</span>
+                                <span class="preset-role doctor">1 Doctor</span>
+                                <span class="preset-role cop">1 Cop</span>
+                                <span class="preset-role narrator">1 Narrator</span>
+                                <span class="preset-role innocent">4 Innocent</span>
+                            </div>
+                        </div>
+
+                        <div class="preset-card" onclick="applyPreset('balanced')">
+                            <h4>Balanced (8 players)</h4>
+                            <div class="preset-roles">
+                                <span class="preset-role mafia">2 Mafia</span>
+                                <span class="preset-role doctor">1 Doctor</span>
+                                <span class="preset-role cop">1 Cop</span>
+                                <span class="preset-role narrator">1 Narrator</span>
+                                <span class="preset-role innocent">3 Innocent</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="container">
+        <p>&copy; 2025 Aaryan Soni. <br> Perfect for parties and social settings. </p>
+    </div>
+</footer>
+
+<!-- Scripts -->
+<script type="module" src="src/main.js"></script>
+</body>
+</html>
