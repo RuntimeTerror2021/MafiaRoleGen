@@ -632,6 +632,15 @@ input::placeholder {
     margin: 0;
 }
 
+.results-header h2 b {
+    color: white;
+    font-size: 16px;
+    border-radius: 32px;
+    background: darkred;
+    padding: 6px 8px;
+    border: 2px solid crimson;
+}
+
 .results-actions {
     display: flex;
     gap: var(--spacing-md);
@@ -734,6 +743,15 @@ input::placeholder {
     color: var(--neutral-400);
     font-size: 0.875rem;
     font-style: italic;
+}
+
+.death-toggle label {
+    color: red;
+}
+
+.death-toggle input {
+    accent-color: red;
+    transform: scale(1.6);
 }
 
 /* Game Summary */

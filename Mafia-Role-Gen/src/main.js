@@ -29,7 +29,8 @@ const gameState = {
         innocent: 2
     },
     assignments: [],
-    revealedCards: new Set()
+    revealedCards: new Set(),
+    alivePlayers: 0
 };
 
 // Role definitions with descriptions and colors
@@ -417,6 +418,10 @@ function showResults() {
 
     displayAssignments();
     displayGameSummary();
+
+    let aliveCount = document.querySelector("#alive-count");
+    aliveCount.innerText = `Alive: ${gameState.players.length-1}/${gameState.players.length-1}`;
+    gameState.alivePlayers = gameState.players.length-1;
 }
 
 function displayAssignments() {
@@ -430,6 +435,11 @@ function displayAssignments() {
 
         const roleInfo = roleDefinitions[assignment.role];
 
+        const deathToggleSection = `<div class="death-toggle">
+                                                <label for="death-toggle"><b>Dead?</b></label>
+                                                <input type="checkbox" name="death-toggle" id="death-toggle">
+                                           </div>`
+
         card.innerHTML = `
             <div class="player-name-large">${escapeHtml(assignment.player)}</div>
             <div class="role-reveal" style="display: none;">
@@ -438,6 +448,7 @@ function displayAssignments() {
                 </div>
                 <div class="role-name">${roleInfo.name}</div>
                 <p class="role-description">${roleInfo.description}</p>
+                ${roleInfo.name === 'Narrator' ? '' : deathToggleSection}
             </div>
             <div class="click-to-reveal">
                 <i class="fas fa-eye" aria-hidden="true"></i>
@@ -446,6 +457,29 @@ function displayAssignments() {
         `;
 
         grid.appendChild(card);
+
+        if(roleInfo.name === 'Narrator') {
+            const roleReveal = card.querySelector('.role-reveal');
+            const clickToReveal = card.querySelector('.click-to-reveal');
+            card.classList.add('revealed');
+            roleReveal.style.display = 'flex';
+            clickToReveal.style.display = 'none';
+        } else {
+            var deathToggle = card.querySelector('#death-toggle');
+            var aliveCount = document.querySelector('#alive-count');
+            deathToggle.onclick = () => {
+                toggleRoleReveal(index);
+
+                if(deathToggle.checked)
+                    gameState.alivePlayers = gameState.alivePlayers - 1;
+                else gameState.alivePlayers = gameState.alivePlayers + 1;
+
+                aliveCount.innerText = `Alive: ${gameState.alivePlayers}/${gameState.players.length-1}`;
+
+            }
+        }
+
+
 
         // Add entrance animation
         setTimeout(() => {
