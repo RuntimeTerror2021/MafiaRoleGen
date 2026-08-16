@@ -903,6 +903,10 @@ document.addEventListener('click', function(e) {
 
 // Performance monitoring
 window.addEventListener('load', function() {
+    if (window.location.hostname === "mafia-role-gen.web.app" || window.location.hostname === "mafia-role-gen.firebaseapp.com") {
+        window.location.href = "https://mafia.aasoni.dev" + window.location.pathname + window.location.search;
+    }
+
     // Log performance metrics
     if (window.performance && window.performance.timing) {
         const loadTime = window.performance.timing.loadEventEnd - window.performance.timing.navigationStart;
