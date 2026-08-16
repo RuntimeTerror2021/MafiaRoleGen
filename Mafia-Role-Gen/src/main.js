@@ -649,33 +649,50 @@ function showNotification(message, type = 'info') {
                 right: 20px;
                 z-index: 10000;
                 max-width: 400px;
-                background: white;
+                min-width: 280px;
+                background: var(--surface-2);
+                color: var(--text);
+                border: 1px solid var(--border-strong);
                 border-radius: 12px;
-                box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+                box-shadow: 0 16px 40px rgba(0,0,0,0.5);
                 animation: slideInRight 0.3s ease-out;
-                border-left: 4px solid var(--primary-color);
+                overflow: hidden;
             }
-            .notification-success { border-left-color: var(--secondary-color); }
-            .notification-error { border-left-color: var(--danger-color); }
-            .notification-info { border-left-color: var(--primary-color); }
+            .notification::before {
+                content: '';
+                position: absolute;
+                left: 0;
+                top: 0;
+                bottom: 0;
+                width: 3px;
+                background: var(--accent);
+            }
+            .notification-success::before { background: var(--success); }
+            .notification-error::before { background: var(--danger); }
+            .notification-info::before { background: var(--accent); }
             .notification-content {
                 display: flex;
                 align-items: center;
                 gap: 12px;
-                padding: 16px;
+                padding: 14px 16px;
+                font-size: 0.875rem;
+                font-family: var(--font);
             }
+            .notification-content > i { color: var(--accent); }
+            .notification-success .notification-content > i { color: var(--success); }
+            .notification-error .notification-content > i { color: var(--danger); }
             .notification-close {
                 background: none;
                 border: none;
                 cursor: pointer;
                 margin-left: auto;
-                color: var(--neutral-400);
+                color: var(--text-3);
                 padding: 4px;
                 border-radius: 4px;
                 transition: color 0.15s ease;
             }
             .notification-close:hover {
-                color: var(--neutral-600);
+                color: var(--text);
             }
             @keyframes slideInRight {
                 from { transform: translateX(100%); opacity: 0; }
