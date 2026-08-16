@@ -137,7 +137,15 @@ function initializeApp() {
         newGameBtn: document.getElementById('newGameBtn'),
 
         // Modal
-        presetModal: document.getElementById('presetModal')
+        presetModal: document.getElementById('presetModal'),
+
+        // Confirm modal
+        confirmModal: document.getElementById('confirmModal'),
+        confirmModalTitle: document.getElementById('confirmModalTitle'),
+        confirmModalMessage: document.getElementById('confirmModalMessage'),
+        confirmModalIcon: document.getElementById('confirmModalIcon'),
+        confirmOkBtn: document.getElementById('confirmOkBtn'),
+        confirmCancelBtn: document.getElementById('confirmCancelBtn')
     };
 }
 
@@ -165,10 +173,20 @@ function setupEventListeners() {
         }
     });
 
+    // Confirm modal events
+    elements.confirmModal.addEventListener('click', function(e) {
+        if (e.target === elements.confirmModal) {
+            closeConfirmModal();
+        }
+    });
+    elements.confirmOkBtn.addEventListener('click', handleConfirmOk);
+    elements.confirmCancelBtn.addEventListener('click', closeConfirmModal);
+
     // Keyboard events
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
             closePresetModal();
+            closeConfirmModal();
         }
     });
 
@@ -256,13 +274,21 @@ function quickAddPlayers() {
 function clearAllPlayers() {
     if (gameState.players.length === 0) return;
 
-    if (confirm('Are you sure you want to remove all players?')) {
-        gameState.players = [];
-        updatePlayersDisplay();
-        updateUI();
-        elements.playerNameInput.focus();
-        announceToScreenReader('All players removed');
-    }
+    showConfirmModal({
+        title: 'Remove all players?',
+        message: 'Are you sure you want to remove all players? This action cannot be undone.',
+        tone: 'danger',
+        icon: 'fa-exclamation-triangle',
+        confirmText: 'Remove All',
+        confirmIcon: 'fa-trash',
+        onConfirm: function() {
+            gameState.players = [];
+            updatePlayersDisplay();
+            updateUI();
+            elements.playerNameInput.focus();
+            announceToScreenReader('All players removed');
+        }
+    });
 }
 
 function updatePlayersDisplay() {
@@ -409,6 +435,8 @@ function updateUI() {
     }
 }
 
+let hasNarrator = false;
+
 function showResults() {
     elements.setupSection.style.display = 'none';
     elements.resultsSection.style.display = 'block';
@@ -420,8 +448,8 @@ function showResults() {
     displayGameSummary();
 
     let aliveCount = document.querySelector("#alive-count");
-    aliveCount.innerText = `Alive: ${gameState.players.length-1}/${gameState.players.length-1}`;
-    gameState.alivePlayers = gameState.players.length-1;
+    aliveCount.innerText = `Alive: ${hasNarrator ? gameState.players.length - 1 : gameState.players.length}/${hasNarrator ? gameState.players.length - 1 : gameState.players.length}`;
+    gameState.alivePlayers = hasNarrator ? gameState.players.length - 1 : gameState.players.length
 }
 
 function displayAssignments() {
@@ -434,6 +462,12 @@ function displayAssignments() {
         card.onclick = () => toggleRoleReveal(index);
 
         const roleInfo = roleDefinitions[assignment.role];
+
+
+        // console.log(roleInfo.name)
+        if (roleInfo.name == 'Narrator') {
+            hasNarrator = true;
+        }
 
         const deathToggleSection = `<div class="death-toggle">
                                                 <label for="death-toggle"><b>Dead?</b></label>
@@ -471,10 +505,11 @@ function displayAssignments() {
                 toggleRoleReveal(index);
 
                 if(deathToggle.checked)
-                    gameState.alivePlayers = gameState.alivePlayers - 1;
-                else gameState.alivePlayers = gameState.alivePlayers + 1;
+                    gameState.alivePlayers --;
+                else gameState.alivePlayers ++;
 
-                aliveCount.innerText = `Alive: ${gameState.alivePlayers}/${gameState.players.length-1}`;
+                // console.log(hasNarrator)
+                aliveCount.innerText = `Alive: ${gameState.alivePlayers}/${hasNarrator ? gameState.players.length - 1 : gameState.players.length}`;
 
             }
         }
@@ -547,23 +582,31 @@ function revealAllRoles() {
 }
 
 function startNewGame() {
-    if (confirm('Start a new game? This will clear all current assignments.')) {
-        // Reset state
-        gameState.assignments = [];
-        gameState.revealedCards.clear();
+    showConfirmModal({
+        title: 'Start a new game?',
+        message: 'This will clear all current role assignments. This action cannot be undone.',
+        tone: 'warning',
+        icon: 'fa-redo',
+        confirmText: 'Start New Game',
+        confirmIcon: 'fa-play',
+        onConfirm: function() {
+            // Reset state
+            gameState.assignments = [];
+            gameState.revealedCards.clear();
 
-        // Show setup section
-        elements.setupSection.style.display = 'block';
-        elements.resultsSection.style.display = 'none';
+            // Show setup section
+            elements.setupSection.style.display = 'block';
+            elements.resultsSection.style.display = 'none';
 
-        // Scroll to top
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
 
-        // Focus on player input
-        elements.playerNameInput.focus();
+            // Focus on player input
+            elements.playerNameInput.focus();
 
-        announceToScreenReader('Started new game');
-    }
+            announceToScreenReader('Started new game');
+        }
+    });
 }
 
 // =========== 8. Modal Management ===========
@@ -590,6 +633,59 @@ function closePresetModal() {
 
     // Return focus
     elements.presetBtn.focus();
+}
+
+// Confirm modal state
+let confirmCallback = null;
+let confirmReturnFocus = null;
+
+function showConfirmModal(options) {
+    const tone = options.tone || 'danger';
+    const icon = options.icon || 'fa-exclamation-triangle';
+    const confirmIcon = options.confirmIcon || 'fa-check';
+    const confirmText = options.confirmText || 'Confirm';
+
+    elements.confirmModalTitle.textContent = options.title || 'Are you sure?';
+    elements.confirmModalMessage.textContent = options.message || '';
+    elements.confirmModalIcon.className = `confirm-icon ${tone}`;
+    elements.confirmModalIcon.innerHTML = `<i class="fas ${icon}" aria-hidden="true"></i>`;
+    elements.confirmOkBtn.innerHTML = `<i class="fas ${confirmIcon}" aria-hidden="true"></i> ${escapeHtml(confirmText)}`;
+    elements.confirmOkBtn.className = `btn ${tone === 'danger' ? 'btn-danger' : 'btn-primary'}`;
+
+    confirmCallback = options.onConfirm || null;
+    confirmReturnFocus = document.activeElement;
+
+    elements.confirmModal.classList.add('active');
+    elements.confirmModal.setAttribute('aria-hidden', 'false');
+
+    // Prevent body scroll
+    document.body.style.overflow = 'hidden';
+
+    // Focus management
+    elements.confirmCancelBtn.focus();
+}
+
+function handleConfirmOk() {
+    const callback = confirmCallback;
+    closeConfirmModal();
+    if (typeof callback === 'function') {
+        callback();
+    }
+}
+
+function closeConfirmModal() {
+    elements.confirmModal.classList.remove('active');
+    elements.confirmModal.setAttribute('aria-hidden', 'true');
+
+    // Restore body scroll
+    document.body.style.overflow = '';
+
+    // Return focus
+    if (confirmReturnFocus && typeof confirmReturnFocus.focus === 'function') {
+        confirmReturnFocus.focus();
+    }
+    confirmReturnFocus = null;
+    confirmCallback = null;
 }
 
 // =========== 9. Preset Management ===========
